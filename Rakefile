@@ -18,20 +18,27 @@ task :respec do
   sh "rerun -c 'rake spec' --ignore 'coverage/*' --ignore 'repostore/*'"
 end
 
-desc 'Run the webserver and application and restart if code changes'
-task :rerun do
-  sh "rerun -c --ignore 'coverage/*' --ignore 'repostore/*' -- bundle exec puma"
-end
-
 namespace :run do
   desc 'Run API in dev mode'
   task :dev do
-    sh 'rerun -c "bundle exec puma -p 9090"'
+    sh "rerun -c --ignore 'coverage/*' --ignore 'repostore/*' -- bundle exec puma -p 9090"
   end
 
   desc 'Run API in test mode'
   task :test do
     sh 'RACK_ENV=test bundle exec puma -p 9090'
+  end
+end
+
+namespace :run do
+  desc 'Run API in dev mode'
+  task :dev do
+    sh 'rerun -c "rackup -p 9090"'
+  end
+
+  desc 'Run API in test mode'
+  task :test do
+    sh 'RACK_ENV=test rackup -p 9090'
   end
 end
 
