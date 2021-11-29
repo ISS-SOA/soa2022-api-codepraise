@@ -9,20 +9,7 @@ end
 
 desc 'Run unit and integration tests'
 Rake::TestTask.new(:spec) do |t|
-  t.pattern = 'spec/tests/{integration,unit}/**/*_spec.rb'
-  t.warning = false
-end
-
-desc 'Run unit and integration tests'
-Rake::TestTask.new(:spec_all) do |t|
   t.pattern = 'spec/tests/**/*_spec.rb'
-  t.warning = false
-end
-
-# NOTE: run `rake run:test` in another process
-desc 'Run acceptance tests'
-Rake::TestTask.new(:spec_accept) do |t|
-  t.pattern = 'spec/tests/acceptance/*_spec.rb'
   t.warning = false
 end
 
@@ -31,25 +18,24 @@ task :respec do
   sh "rerun -c 'rake spec' --ignore 'coverage/*' --ignore 'repostore/*'"
 end
 
-desc 'Run the webserver and application'
-task :run do
-  sh 'bundle exec puma'
-end
-
 desc 'Run the webserver and application and restart if code changes'
 task :rerun do
   sh "rerun -c --ignore 'coverage/*' --ignore 'repostore/*' -- bundle exec puma"
 end
 
-desc 'Generates a 64 by secret for Rack::Session'
-task :new_session_secret do
-  require 'base64'
-  require 'SecureRandom'
-  secret = SecureRandom.random_bytes(64).then { Base64.urlsafe_encode64(_1) }
-  puts "SESSION_SECRET: #{secret}"
+namespace :run do
+  desc 'Run API in dev mode'
+  task :dev do
+    sh 'rerun -c "bundle exec puma -p 9090"'
+  end
+
+  desc 'Run API in test mode'
+  task :test do
+    sh 'RACK_ENV=test bundle exec puma -p 9090'
+  end
 end
 
-namespace :db do # rubocop:disable Metrics/BlockLength
+namespace :db do
   task :config do
     require 'sequel'
     require_relative 'config/environment' # load config info
@@ -140,7 +126,7 @@ namespace :quality do
 
   desc 'code smell detector'
   task :reek do
-    sh 'reek'
+    sh "reek #{only_app}"
   end
 
   desc 'complexiy analysis'
