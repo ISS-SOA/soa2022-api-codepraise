@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Style/Documentation
-# rubocop:disable Layout/EmptyLineBetweenDefs
+
 module CodePraise
   module Value
     module CodeLanguage
@@ -99,5 +99,5 @@ module CodePraise
     end
   end
 end
-# rubocop:enable Layout/EmptyLineBetweenDefs
+
 # rubocop:enable Style/Documentation

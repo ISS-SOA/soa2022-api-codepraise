@@ -20,8 +20,6 @@ module CodePraise
     Figaro.load
     def self.config = Figaro.env
 
-    use Rack::Session::Cookie, secret: config.SESSION_SECRET
-
     configure :app_test do
       require_relative '../spec/helpers/vcr_helper'
       VcrHelper.setup_vcr
@@ -29,7 +27,7 @@ module CodePraise
     end
 
     # Database Setup
-    configure :development, :test , :app_test do
+    configure :development, :test, :app_test do
       require 'pry'; # for breakpoints
       ENV['DATABASE_URL'] = "sqlite://#{config.DB_FILENAME}"
     end
