@@ -6,13 +6,12 @@ module CodePraise
   # Web App
   class App < Roda
     plugin :halt
-    plugin :flash
+    plugin :caching
     plugin :all_verbs # allows DELETE and other HTTP verbs beyond GET/POST
     plugin :common_logger, $stderr
 
     # use Rack::MethodOverride # for other HTTP verbs (with plugin all_verbs)
 
-    # rubocop:disable Metrics/BlockLength
     route do |routing|
       response['Content-Type'] = 'application/json'
 
@@ -21,7 +20,7 @@ module CodePraise
         message = "CodePraise API v1 at /api/v1/ in #{App.environment} mode"
 
         result_response = Representer::HttpResponse.new(
-          Response::ApiResult.new(status: :ok, message: message)
+          Response::ApiResult.new(status: :ok, message:)
         )
 
         response.status = result_response.http_status_code
@@ -33,6 +32,8 @@ module CodePraise
           routing.on String, String do |owner_name, project_name|
             # GET /projects/{owner_name}/{project_name}[/folder_namepath/]
             routing.get do
+              response.cache_control public: true, max_age: 300
+
               path_request = Request::ProjectPath.new(
                 owner_name, project_name, request
               )
@@ -55,7 +56,7 @@ module CodePraise
             # POST /projects/{owner_name}/{project_name}
             routing.post do
               result = Service::AddProject.new.call(
-                owner_name: owner_name, project_name: project_name
+                owner_name:, project_name:
               )
 
               if result.failure?
@@ -88,6 +89,5 @@ module CodePraise
         end
       end
     end
-    # rubocop:enable Metrics/BlockLength
   end
 end
