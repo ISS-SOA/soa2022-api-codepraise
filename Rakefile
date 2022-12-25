@@ -9,7 +9,6 @@ end
 
 desc 'Run unit and integration tests'
 Rake::TestTask.new(:spec) do |t|
-  puts 'Make sure worker is running in separate process'
   t.pattern = 'spec/tests/**/*_spec.rb'
   t.warning = false
 end
@@ -39,12 +38,12 @@ end
 namespace :run do
   desc 'Run API in dev mode'
   task :dev do
-    sh 'rerun -c "rackup -p 9090"'
+    sh 'puma config.ru -p 9090'
   end
 
   desc 'Run API in test mode'
   task :test do
-    sh 'RACK_ENV=test rackup -p 9090'
+    sh 'RACK_ENV=test puma config.ru -p 9090'
   end
 end
 
